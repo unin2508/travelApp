@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".activity.LoginActivity">
 
     <LinearLayout
         android:id="@+id/title_login"
@@ -50,6 +50,7 @@
         </TextView>
 
         <EditText
+            android:id="@+id/email_tf_login"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:hint="Enter your email"
@@ -81,6 +82,7 @@
         </TextView>
 
         <EditText
+            android:id="@+id/password_tf_login"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:hint="Enter your password"

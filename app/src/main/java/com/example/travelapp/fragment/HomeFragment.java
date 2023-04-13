@@ -1,4 +1,4 @@
-package com.example.travelapp;
+package com.example.travelapp.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+
+import com.example.travelapp.R;
+import com.example.travelapp.activity.LoginActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,7 +56,7 @@ public class HomeFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     Log.d("hello","test");
-                    Intent intent = new Intent(getActivity(),LoginActivity.class);
+                    Intent intent = new Intent(getActivity(), LoginActivity.class);
                     startActivity(intent);
 
                 }
