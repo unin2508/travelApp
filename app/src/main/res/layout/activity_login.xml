@@ -135,31 +135,94 @@
             android:id="@+id/login_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/custom_input"
+            android:background="@drawable/border_button"
             android:text="Login"
             android:textSize="17sp"
             android:textColor="@color/white"
             android:textAllCaps="false"/>
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/view_line"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/login_btn"
-            android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:layout_centerVertical="true">
+
             <View
-                android:layout_width="match_parent"
+                android:layout_alignParentStart="true"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
                 android:layout_height="1dp"
-                android:background="@android:color/darker_gray"/>
+                android:background="@android:color/darker_gray"
+                android:layout_toStartOf="@id/textOr"
+                android:layout_marginEnd="10dp"
+                />
 
+            <TextView
+                android:id="@+id/textOr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Or With"
+                android:textColor="#999EA1"
+                ></TextView>
 
+            <View
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"
+                android:layout_toEndOf="@id/textOr"
+                android:layout_marginStart="10dp"
+                />
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/view_line"
+            android:orientation="horizontal"
+            android:weightSum="2"
+            android:layout_marginTop="10dp">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginEnd="10dp">
+                <Button
+                    android:id="@+id/login_with_fb_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Facebook"
+                    android:drawableStart="@drawable/ic_fb"
+                    android:textAllCaps="false"
+                    android:background="@drawable/custom_input"
+                    >
+                </Button>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp">
+                <Button
+                    android:id="@+id/login_with_gg_btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:text="Google"
+                    android:drawableStart="@drawable/ic_google"
+                    android:textAllCaps="false"
+                    android:background="@drawable/custom_input"
+                    >
+                </Button>
+            </LinearLayout>
         </LinearLayout>
-
-
     </RelativeLayout>
-
-
-
     <LinearLayout
         android:id="@+id/toLoginView_btn"
         android:layout_width="wrap_content"
@@ -184,6 +247,4 @@
             >
         </TextView>
     </LinearLayout>
-
-
 </RelativeLayout>
