@@ -3,7 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragment.HomeFragment" >
+    tools:context=".fragment.HomeFragment"
+    android:background="#F8F8F8"
+    >
 
 
     <RelativeLayout
@@ -52,6 +54,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/welcome_view">
@@ -88,6 +91,18 @@
         </ImageButton>
 
     </RelativeLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/category_rv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/search_view"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        >
+
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 
 
