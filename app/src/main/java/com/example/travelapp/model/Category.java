@@ -1,4 +1,4 @@
-package com.example.travelapp;
+package com.example.travelapp.model;
 
 public class Category {
     private int id;

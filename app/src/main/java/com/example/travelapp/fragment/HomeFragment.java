@@ -6,6 +6,8 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -13,10 +15,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 
-import com.example.travelapp.Category;
-import com.example.travelapp.CategoryAdapter;
+import com.example.travelapp.model.Category;
+import com.example.travelapp.adapter.CategoryAdapter;
 import com.example.travelapp.R;
 import com.example.travelapp.activity.LoginActivity;
 
@@ -32,6 +35,7 @@ public class HomeFragment extends Fragment {
     ImageButton imageButton;
     RecyclerView recyclerView;
     CategoryAdapter categoryAdapter;
+    FrameLayout serviceFrameLayout;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -59,6 +63,7 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        serviceFrameLayout = view.findViewById(R.id.frame_service);
         imageButton = view.findViewById(R.id.filter_btn);
         if (imageButton != null) {
             imageButton.setOnClickListener(new ViewGroup.OnClickListener() {
@@ -78,6 +83,12 @@ public class HomeFragment extends Fragment {
         recyclerView.setLayoutManager(linearLayoutManager);
         categoryAdapter.setData(getListCategory());
         recyclerView.setAdapter(categoryAdapter);
+
+        Fragment fragment = new FlightFragment();
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.frame_service,fragment);
+        fragmentTransaction.commit();
     }
 
     private List<Category> getListCategory() {

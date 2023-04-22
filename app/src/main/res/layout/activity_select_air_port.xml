@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.SelectAirPortActivity"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/search_select_airport_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="10dp"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/cancel_search_btn"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/search_airport_tf"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/custom_input"
+                android:drawableStart="@drawable/ic_search"
+                android:drawablePadding="10dp"
+                android:hint="Search"
+                android:paddingStart="10dp"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/cancel_search_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="Cancel"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"
+            >
+        </Button>
+
+    </RelativeLayout>
+    <ListView
+        android:id="@+id/list_airport_item"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        />
+
+</LinearLayout>
