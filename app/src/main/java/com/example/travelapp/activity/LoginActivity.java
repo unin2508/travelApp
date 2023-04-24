@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText passwordTF;
     Button loginBtn;
     Button loginGgBtn;
+    TextView textView;
     private GoogleSignInClient signInClient;
 
     @Override
@@ -42,6 +44,15 @@ public class LoginActivity extends AppCompatActivity {
         passwordTF = findViewById(R.id.password_tf_login);
         loginBtn = findViewById(R.id.login_btn);
         loginGgBtn = findViewById(R.id.login_with_gg_btn);
+        textView = findViewById(R.id.registerNow);
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), RegisterActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
