@@ -67,7 +67,6 @@
                 android:layout_alignParentBottom="true"
                 android:text="To"
                 android:textColor="@color/black"
-
                 android:textSize="12sp"
                 android:textStyle="normal" />
         </RelativeLayout>
@@ -163,6 +162,7 @@
                     android:orientation="horizontal">
 
                     <Button
+                        android:id="@+id/minus_adult_ticket_btn"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:background="@drawable/ic_minus" />
@@ -177,11 +177,11 @@
                         app:cardCornerRadius="5dp"
                         app:cardElevation="5dp">
 
-                        <EditText
+                        <TextView
+                            android:id="@+id/adult_ticket_text"
                             android:layout_width="38dp"
                             android:layout_height="match_parent"
                             android:background="@null"
-                            android:focusable="false"
                             android:text="00"
                             android:textAlignment="center"
                             android:textColor="#9B9B9B"
@@ -190,6 +190,7 @@
 
 
                     <Button
+                        android:id="@+id/plus_adult_ticket_btn"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:background="@drawable/ic_plus" />
@@ -218,6 +219,7 @@
                     android:orientation="horizontal">
 
                     <Button
+                        android:id="@+id/minus_child_ticket_btn"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:background="@drawable/ic_minus" />
@@ -232,7 +234,8 @@
                         app:cardCornerRadius="5dp"
                         app:cardElevation="5dp">
 
-                        <EditText
+                        <TextView
+                            android:id="@+id/child_ticket_text"
                             android:layout_width="38dp"
                             android:layout_height="match_parent"
                             android:background="@null"
@@ -245,6 +248,7 @@
 
 
                     <Button
+                        android:id="@+id/plus_child_ticket_btn"
                         android:layout_width="28dp"
                         android:layout_height="28dp"
                         android:background="@drawable/ic_plus" />
@@ -253,6 +257,7 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/search_flight_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="25dp"

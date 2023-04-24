@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 
 import com.example.travelapp.R;
@@ -26,13 +27,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SelectAirPortActivity extends AppCompatActivity {
+    private ListView listView;
+
+    private List<Airport> airportArrayList;
+    private Button cancleButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_air_port);
         Intent intent = getIntent();
-        Log.d("debug", String.valueOf(intent.getIntExtra("type",-1)));
+        Integer type = intent.getIntExtra("type",-1);
+        cancleButton = findViewById(R.id.cancel_search_btn);
+        cancleButton.setOnClickListener(view -> {finish();});
         Gson gson = new Gson();
         try{
             InputStream inputStream = getAssets().open("airports.json");
@@ -40,15 +48,19 @@ public class SelectAirPortActivity extends AppCompatActivity {
             inputStream.read(data);
             inputStream.close();
             String jsonString = new String(data,"UTF-8");
-            List<Airport> airportArrayList = gson.fromJson(jsonString, new TypeToken<List<Airport>>() {}.getType());
-            ListView listView = findViewById(R.id.list_airport_item);
+            airportArrayList = gson.fromJson(jsonString, new TypeToken<List<Airport>>() {}.getType());
+            listView = findViewById(R.id.list_airport_item);
             AirportAdapter airportAdapter = new AirportAdapter(this.getBaseContext(),airportArrayList.subList(0,30));
             listView.setAdapter(airportAdapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     Log.d("debug","click " + i);
-                    intent.putExtra("FromAirport",i);
+                    if (type == 0) {
+                        intent.putExtra("FromAirport",airportArrayList.get(i).getName());
+                    } else if (type == 1) {
+                        intent.putExtra("ToAirport",airportArrayList.get(i).getName());
+                    }
                     setResult(RESULT_OK, intent);
                     onBackPressed();
                 }
