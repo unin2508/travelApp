@@ -1,5 +1,6 @@
 package com.example.travelapp.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.util.Log;
@@ -40,7 +41,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Catego
     }
 
     @Override
-    public void onBindViewHolder(@NonNull CategortViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull CategortViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Category category = this.categoryList.get(position);
         if (category == null){
             return;

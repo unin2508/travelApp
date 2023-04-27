@@ -12,7 +12,10 @@
         android:theme="@style/Theme.TravelApp"
         tools:targetApi="31">
         <activity
-            android:name=".activity.SelectFilghtActivity"
+            android:name=".activity.SelectFlightTicketActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.SelectFlightActivity"
             android:exported="false" />
         <activity
             android:name=".activity.SelectAirPortActivity"

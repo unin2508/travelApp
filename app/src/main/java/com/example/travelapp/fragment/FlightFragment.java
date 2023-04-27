@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.example.travelapp.R;
 import com.example.travelapp.activity.SelectAirPortActivity;
-import com.example.travelapp.activity.SelectFilghtActivity;
+import com.example.travelapp.activity.SelectFlightActivity;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -176,7 +176,7 @@ public class FlightFragment extends Fragment {
         searchFlightBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SelectFilghtActivity.class);
+                Intent intent = new Intent(view.getContext(), SelectFlightActivity.class);
                 startActivity(intent);
             }
         });
