@@ -57,9 +57,9 @@ public class SelectAirPortActivity extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     Log.d("debug","click " + i);
                     if (type == 0) {
-                        intent.putExtra("FromAirport",airportArrayList.get(i).getName());
+                        intent.putExtra("FromAirport",i);
                     } else if (type == 1) {
-                        intent.putExtra("ToAirport",airportArrayList.get(i).getName());
+                        intent.putExtra("ToAirport",i);
                     }
                     setResult(RESULT_OK, intent);
                     onBackPressed();

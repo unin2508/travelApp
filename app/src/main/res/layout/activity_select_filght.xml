@@ -33,6 +33,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_centerHorizontal="true"
             >
             <TextView
                 android:id="@+id/date_of_flight_tv"
@@ -50,16 +53,19 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/date_of_flight_tv"
                 android:layout_margin="10dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="10"
+                >
 
                 <LinearLayout
+                    android:layout_weight="2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-
                     >
 
                     <TextView
+                        android:id="@+id/code_departure_airport_Tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="DEL"
@@ -68,6 +74,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/name_departure_airport_Tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Delhi International Airport"
@@ -77,17 +84,20 @@
                 </LinearLayout>
 
                 <ImageView
+                    android:layout_weight="6"
                     android:layout_width="150dp"
                     android:layout_height="40dp"
                     android:src="@drawable/image_from_to" />
 
                 <LinearLayout
+                    android:layout_weight="2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="5dp"
                     android:orientation="vertical">
 
                     <TextView
+                        android:id="@+id/code_arrival_airport_Tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="DEL"
@@ -96,6 +106,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/name_arrival_airport_Tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Delhi International Airport"
@@ -108,6 +119,7 @@
             </LinearLayout>
 
             <TextView
+                android:id="@+id/time_of_flight_selectFlight_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="04h 30m"

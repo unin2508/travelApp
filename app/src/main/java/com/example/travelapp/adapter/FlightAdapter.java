@@ -17,7 +17,12 @@ import com.example.travelapp.R;
 import com.example.travelapp.activity.SelectFlightTicketActivity;
 import com.example.travelapp.model.Category;
 import com.example.travelapp.model.Flight;
+import com.example.travelapp.service.AirportDao;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightViewHolder> {
@@ -42,17 +47,31 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightView
 
     @Override
     public void onBindViewHolder(@NonNull FlightViewHolder holder, int position) {
+        int seconds = (int) (flightList.get(position).getArrivalTime() - flightList.get(position).getDepartureTime()); // replace with your desired number of seconds
+        int hours = seconds / 3600; // calculate the number of hours
+        int minutes = (seconds % 3600) / 60; // calculate the number of minutes
+        LocalTime time = LocalTime.of(hours, minutes);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("hh'h' mm'm'");
+        String flightTimeString = time.format(formatter2);
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        Timestamp departureTime = new Timestamp(flightList.get(position).getDepartureTime()*1000L);
+        Timestamp arrivalTime = new Timestamp(flightList.get(position).getArrivalTime()*1000L);
+//        String formattedTime = formatter.format(timestamp);
         holder.airlineTv.setText(flightList.get(position).getAirlineName());
         holder.departureAirportTv.setText(flightList.get(position).getDepartureAirport());
-        holder.departureTimeTv.setText(flightList.get(position).getDepartureTime());
-        holder.timeFlightTv.setText("04h:15m");
+
+        holder.departureTimeTv.setText(formatter.format(departureTime));
+        holder.timeFlightTv.setText(flightTimeString);
         holder.arriveAirportTv.setText(flightList.get(position).getArrivalAirport());
-        holder.timeArriveTv.setText(flightList.get(position).getArrivalTime());
-        holder.minPriceTv.setText("1000 USD");
+        holder.timeArriveTv.setText(formatter.format(flightList.get(position).getArrivalTime()*1000L));
+        holder.minPriceTv.setText(flightList.get(position).getMinPrice()+"000 VND");
 
         holder.layout.setOnClickListener(view -> {
             Intent intent = new Intent(context, SelectFlightTicketActivity.class);
             intent.putExtra("flight",flightList.get(position));
+            intent.putExtra("flightTime",flightTimeString);
+            intent.putExtra("departureAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getDepartureAirport()));
+            intent.putExtra("arrivalAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getArrivalAirport()));
             context.startActivity(intent);
         });
 

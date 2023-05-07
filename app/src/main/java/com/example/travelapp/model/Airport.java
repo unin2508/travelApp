@@ -1,8 +1,9 @@
 package com.example.travelapp.model;
 
 
+import java.io.Serializable;
 
-public class Airport{
+public class Airport implements Serializable {
     private String name;
     private String city;
     private String country;
@@ -10,6 +11,8 @@ public class Airport{
     private Geoloc _geoloc;
     private int links_count;
     private String objectID;
+
+    public Airport(){}
 
     public Airport(String name, String city, String country, String iata_code, Geoloc _geoloc, int links_count, String objectID) {
         this.name = name;

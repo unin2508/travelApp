@@ -15,25 +15,50 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.travelapp.R;
 import com.example.travelapp.activity.SelectAirPortActivity;
 import com.example.travelapp.activity.SelectFlightActivity;
+import com.example.travelapp.model.Airport;
+import com.example.travelapp.model.Flight;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class FlightFragment extends Fragment {
-    private String airportFrom;
-    private String airportTo;
-    private Date departureDate;
+    private Integer airportFrom = -1;
+    private Integer airportTo = -1;
+    private LocalDate departureDate;
     private Button selectAirportFromBtn;
     private Button selectAirPortToBtn;
     private Button selectDepartureDateBtn;
@@ -45,6 +70,9 @@ public class FlightFragment extends Fragment {
     private Button minusChildTicketBtn;
     private TextView childTicketTv;
     private Button searchFlightBtn;
+    private ProgressBar progressBar;
+
+    private ArrayList<Airport> airportArrayList;
 
 
 
@@ -67,8 +95,27 @@ public class FlightFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        try{
+            Gson gson = new Gson();
+            InputStream inputStream = getActivity().getAssets().open("airports.json");
+            byte [] data = new byte[inputStream.available()];
+            inputStream.read(data);
+            inputStream.close();
+            String jsonString = new String(data,"UTF-8");
+            airportArrayList = gson.fromJson(jsonString, new TypeToken<List<Airport>>() {}.getType());
+        } catch (IOException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        progressBar = view.findViewById(R.id.progress_bar_flight);
 
         plusAdultTicketBtn = view.findViewById(R.id.plus_adult_ticket_btn);
         minusAdultTicketBtn = view.findViewById(R.id.minus_adult_ticket_btn);
@@ -84,14 +131,14 @@ public class FlightFragment extends Fragment {
 
         searchFlightBtn = view.findViewById(R.id.search_flight_btn);
 
-        if (airportFrom == null) {
-            selectAirportFromBtn.setText("Choose Depature from");
+        if (airportFrom == -1) {
+            selectAirportFromBtn.setText("Choose Departure from");
             selectAirportFromBtn.setTextColor(Color.parseColor("#9B9B9B"));
         } else {
             selectAirportFromBtn.setText(airportFrom);
             selectAirportFromBtn.setTextColor(Color.parseColor("#000000"));
         }
-        if (airportTo == null) {
+        if (airportTo == -1) {
             selectAirPortToBtn.setText("Choose Arrival at");
             selectAirPortToBtn.setTextColor(Color.parseColor("#9B9B9B"));
         } else {
@@ -123,7 +170,7 @@ public class FlightFragment extends Fragment {
                 DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        departureDate = new Date(year,monthOfYear,dayOfMonth);
+                        departureDate = LocalDate.of(year, monthOfYear+1, dayOfMonth);
                         selectDepartureDateBtn.setText(dayOfMonth+"/"+(monthOfYear+1)+"/"+year);
                         selectDepartureDateBtn.setTextColor(Color.parseColor("#000000"));
                     }
@@ -176,10 +223,49 @@ public class FlightFragment extends Fragment {
         searchFlightBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), SelectFlightActivity.class);
-                startActivity(intent);
+                if (airportFrom == -1){
+                    Toast.makeText(getContext(),"Pick Departure Airport",Toast.LENGTH_LONG).show();
+                } else if (airportTo == -1){
+                    Toast.makeText(getContext(),"Pick Arrive Airport",Toast.LENGTH_LONG).show();
+                } else if (departureDate == null){
+                    Toast.makeText(getContext(),"Pick Departure Date",Toast.LENGTH_LONG).show();
+                } else {
+                    progressBar.setVisibility(View.VISIBLE);
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("flights");
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+                    String formattedDate = departureDate.format(formatter);
+                    ArrayList<Flight> flightSearchList = new ArrayList<>();
+                    databaseReference.child(formattedDate).child(airportArrayList.get(airportFrom).getIata_code()).child(airportArrayList.get(airportTo).getIata_code()).orderByChild("departureTime").addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            progressBar.setVisibility(View.INVISIBLE);
+                            if (!snapshot.hasChildren()) {
+                                Toast.makeText(getContext(),"khong co chuyen bay phu hop",Toast.LENGTH_LONG).show();
+                            } else {
+                                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                                    Flight flight = dataSnapshot.getValue(Flight.class);
+                                    flightSearchList.add(flight);
+                                }
+                                Intent intent = new Intent(view.getContext(), SelectFlightActivity.class);
+                                Log.d("debug",flightSearchList.size()+" gui");
+                                intent.putExtra("flightsSearch",flightSearchList);
+                                intent.putExtra("flightDate",departureDate);
+                                intent.putExtra("departureAirport",airportArrayList.get(airportFrom));
+                                intent.putExtra("arrivalAirport",airportArrayList.get(airportTo));
+                                startActivity(intent);
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                        }
+                    });
+
+                }
             }
         });
+
+
 
     }
 
@@ -196,14 +282,17 @@ public class FlightFragment extends Fragment {
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == getActivity().RESULT_OK) {
                         Intent intent = result.getData();
-                        String fromAirPort = intent.getStringExtra("FromAirport");
-                        String toAirPort = intent.getStringExtra("ToAirport");
-                        if (fromAirPort != null){
-                            selectAirportFromBtn.setText(fromAirPort);
+                        int airportFromIntent = intent.getIntExtra("FromAirport",-1);
+                        int airportToIntent = intent.getIntExtra("ToAirport",-1);
+
+                        if (airportFromIntent != -1){
+                            airportFrom = airportFromIntent;
+                            selectAirportFromBtn.setText(airportArrayList.get(airportFromIntent).getName());
                             selectAirportFromBtn.setTextColor(Color.parseColor("#000000"));
                         }
-                        if (toAirPort != null){
-                            selectAirPortToBtn.setText(toAirPort);
+                        if (airportToIntent != -1){
+                            airportTo = airportToIntent;
+                            selectAirPortToBtn.setText(airportArrayList.get(airportToIntent).getName());
                             selectAirPortToBtn.setTextColor(Color.parseColor("#000000"));
                         }
                         // Handle the Intent

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicketAdapter.FlightTicketViewHolder> {
 
-    private Context context;
+    private final Context context;
     private List<FlightTicket> flightTicketList;
     private List<FlightTicket> flightTicketSelectedList = new ArrayList<>();
 
@@ -42,15 +42,13 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
     @Override
     public void onBindViewHolder(@NonNull FlightTicketViewHolder holder, int position) {
         int row = (int) position/6;
-        setUpUI(holder.imageButton1,flightTicketList.get(row*6 +0));
-        setUpUI(holder.imageButton2,flightTicketList.get(row*6 +1));
-        setUpUI(holder.imageButton3,flightTicketList.get(row*6 +2));
-        setUpUI(holder.imageButton4,flightTicketList.get(row*6 +3));
-        setUpUI(holder.imageButton5,flightTicketList.get(row*6 +4));
-        setUpUI(holder.imageButton6,flightTicketList.get(row*6 +5));
-
-
-
+        holder.rowTv.setText(position+1+"");
+        setUpUI(holder.imageButton1,flightTicketList.get(row * 6),row,0);
+        setUpUI(holder.imageButton2,flightTicketList.get(row*6 +1),row,1);
+        setUpUI(holder.imageButton3,flightTicketList.get(row*6 +2),row,2);
+        setUpUI(holder.imageButton4,flightTicketList.get(row*6 +3),row,3);
+        setUpUI(holder.imageButton5,flightTicketList.get(row*6 +4),row,4);
+        setUpUI(holder.imageButton6,flightTicketList.get(row*6 +5),row,5);
     }
 
 
@@ -62,12 +60,22 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
         return 0;
     }
 
-    private void setUpUI(ImageButton button, FlightTicket flightTicket){
+    private void setUpUI(ImageButton button, FlightTicket flightTicket,int row,int index){
+        FlightTicket ticket = flightTicketList.get(row*6+index);
         if (flightTicket.getSold()){
             button.setImageResource(R.drawable.ic_ticket_booked);
         } else if (!flightTicketSelectedList.contains(flightTicket)){
             button.setImageResource(R.drawable.ic_ticket_available);
         }
+        button.setOnClickListener(view -> {
+            if (flightTicketSelectedList.contains(ticket)){
+                button.setImageResource(R.drawable.ic_ticket_available);
+                flightTicketSelectedList.remove(ticket);
+            } else {
+                button.setImageResource(R.drawable.ic_ticket_selected);
+                flightTicketSelectedList.add(ticket);
+            }
+        });
 
     }
 
@@ -88,7 +96,7 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
             imageButton4 = itemView.findViewById(R.id.ticket4_btn);
             imageButton5 = itemView.findViewById(R.id.ticket5_btn);
             imageButton6 = itemView.findViewById(R.id.ticket6_btn);
-
+            rowTv = itemView.findViewById(R.id.row_ticket_tv);
         }
     }
 }

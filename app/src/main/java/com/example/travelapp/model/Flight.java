@@ -1,19 +1,29 @@
 package com.example.travelapp.model;
 
+import android.util.Log;
+
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 public class Flight implements Serializable {
-    private String id;
+    private  String id;
     private String departureAirport;
     private String arrivalAirport;
-    private String departureTime;
-    private String arrivalTime;
+    private Long departureTime;
+    private Long arrivalTime;
     private String airlineName;
     private Integer seat;
     private Integer minPrice;
+    private List<FlightTicket> ticketList;
+
+    public Flight(){
+
+    }
 
 
-    public Flight(String id, String departureAirport, String arrivalAirport, String departureTime, String arrivalTime, String airlineName, Integer seat,Integer minPrice) {
+    public Flight(String id,String departureAirport, String arrivalAirport, Long departureTime, Long arrivalTime, String airlineName, Integer seat,Integer minPrice) {
         this.id = id;
         this.departureAirport = departureAirport;
         this.arrivalAirport = arrivalAirport;
@@ -22,6 +32,21 @@ public class Flight implements Serializable {
         this.airlineName = airlineName;
         this.seat = seat;
         this.minPrice = minPrice;
+        List<FlightTicket> ticketList = new ArrayList<>();
+        for (int i = 0;i<240;i++){
+            int i1 = i % 6 + (int) 'A';
+            char column = (char)i1;
+            String row = (int)i/6+ "" ;
+            String seatTicket = column+row;
+            FlightTicket ticket = null;
+            if (i<60){
+                ticket = new FlightTicket(UUID.randomUUID().toString(),id,"business",seatTicket,"A5","T2",minPrice+500,false,null);
+            } else {
+                ticket = new FlightTicket(UUID.randomUUID().toString(),id,"eco",seatTicket,"A5","T2",minPrice,false,null);
+            }
+            ticketList.add(ticket);
+        }
+        this.ticketList = ticketList;
     }
 
     public String getId() {
@@ -48,19 +73,19 @@ public class Flight implements Serializable {
         this.arrivalAirport = arrivalAirport;
     }
 
-    public String getDepartureTime() {
+    public Long getDepartureTime() {
         return departureTime;
     }
 
-    public void setDepartureTime(String departureTime) {
+    public void setDepartureTime(Long departureTime) {
         this.departureTime = departureTime;
     }
 
-    public String getArrivalTime() {
+    public Long getArrivalTime() {
         return arrivalTime;
     }
 
-    public void setArrivalTime(String arrivalTime) {
+    public void setArrivalTime(Long arrivalTime) {
         this.arrivalTime = arrivalTime;
     }
 
@@ -86,5 +111,13 @@ public class Flight implements Serializable {
 
     public void setMinPrice(Integer minPrice) {
         this.minPrice = minPrice;
+    }
+
+    public List<FlightTicket> getTicketList() {
+        return ticketList;
+    }
+
+    public void setTicketList(List<FlightTicket> ticketList) {
+        this.ticketList = ticketList;
     }
 }

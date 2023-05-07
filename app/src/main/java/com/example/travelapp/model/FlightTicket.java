@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class FlightTicket implements Serializable {
     private String id;
-    private Flight flight;
+    private String flightId;
     private String type;
     private String seat;
     private String gate;
@@ -13,9 +13,13 @@ public class FlightTicket implements Serializable {
     private Boolean isSold;
     private String userId;
 
-    public FlightTicket(String id, Flight flight, String type, String seat, String gate, String terminal, Integer price, Boolean isSold, String userId) {
+    public FlightTicket(){
+
+    }
+
+    public FlightTicket(String id,String flightId, String type, String seat, String gate, String terminal, Integer price, Boolean isSold, String userId) {
         this.id = id;
-        this.flight = flight;
+        this.flightId = flightId;
         this.type = type;
         this.seat = seat;
         this.gate = gate;
@@ -25,20 +29,12 @@ public class FlightTicket implements Serializable {
         this.userId = userId;
     }
 
-    public String getId() {
-        return id;
+    public String getFlightId() {
+        return flightId;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Flight getFlight() {
-        return flight;
-    }
-
-    public void setFlight(Flight flight) {
-        this.flight = flight;
+    public void setFlightId(String flightId) {
+        this.flightId = flightId;
     }
 
     public String getType() {
