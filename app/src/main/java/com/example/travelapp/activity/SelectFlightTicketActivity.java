@@ -4,12 +4,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.travelapp.R;
 import com.example.travelapp.adapter.RowFlightTicketAdapter;
@@ -31,7 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-public class SelectFlightTicketActivity extends AppCompatActivity {
+public class SelectFlightTicketActivity extends AppCompatActivity implements RowFlightTicketAdapter.OnRowFlightTicketAdapterItemClickListener {
 
     private ImageButton backBtn;
     private RecyclerView recyclerView;
@@ -42,11 +49,15 @@ public class SelectFlightTicketActivity extends AppCompatActivity {
     private TextView codeArrivalAirportTv;
     private TextView nameArrivalAirportTv;
     private TextView timeOfFlightTv;
+    private Button continueButton;
+
+    private List<FlightTicket> flightTicketSelectedList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_flight_ticket);
+        flightTicketSelectedList = new ArrayList<>();
         Intent intent = getIntent();
         Flight flight = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
@@ -95,7 +106,7 @@ public class SelectFlightTicketActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.ticket_recyclerView);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         recyclerView.setLayoutManager(linearLayoutManager);
-        RowFlightTicketAdapter adapter = new RowFlightTicketAdapter(this);
+        RowFlightTicketAdapter adapter = new RowFlightTicketAdapter(this,this);
 //        List<FlightTicket> flightTicketList = new ArrayList<>();
 //        Flight flight1 =  new Flight(UUID.randomUUID().toString(),"SGN","HNA",1684101600L,1684109700L,"VN",240,1900);
 //        flightTicketList.add(new FlightTicket(UUID.randomUUID().toString(),"001","Eco","A1","","",1000,false,null));
@@ -114,5 +125,70 @@ public class SelectFlightTicketActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
         DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference();
 
+        continueButton = findViewById(R.id.continue_flight_ticket_btn);
+        continueButton.setOnClickListener(view -> {
+            if (flightTicketSelectedList.isEmpty()){
+                Toast.makeText(this,"Please pick a ticket",Toast.LENGTH_LONG).show();
+                return;
+            }
+            final Dialog dialog = new Dialog(this);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.confirm_flight_ticket_layout);
+
+            Window window = dialog.getWindow();
+            if (window == null){
+                return;
+            }
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
+            WindowManager.LayoutParams windowAttibutes = window.getAttributes();
+            windowAttibutes.gravity = Gravity.CENTER;
+
+            window.setAttributes(windowAttibutes);
+            dialog.setCancelable(false);
+
+            Button cancelDialog = dialog.findViewById(R.id.cancel_booking_button);
+            Button confirmBtn = dialog.findViewById(R.id.confirm_booking_button);
+            TextView contentTv = dialog.findViewById(R.id.flight_ticket_booking_tv);
+
+            int sumPrice = 0;
+            int sumEcoTicket = 0;
+            int sumBusinessTicket = 0;
+            String seatBusiness = "";
+            String seatEco = "";
+            for (FlightTicket flightTicket : this.flightTicketSelectedList){
+                if (flightTicket.getType().equals("business")){
+                    sumBusinessTicket += 1;
+                    seatBusiness += flightTicket.getSeat() + ",";
+                } else if (flightTicket.getType().equals("eco")) {
+                    sumEcoTicket += 1;
+                    seatEco += flightTicket.getSeat() + ",";
+                }
+                sumPrice += flightTicket.getPrice();
+            }
+            if (seatBusiness.length()>0){
+                seatBusiness = seatBusiness.substring(0,seatBusiness.length()-1);
+            }
+            if (seatEco.length()>0){
+                seatEco = seatEco.substring(0,seatEco.length()-1);
+            }
+            contentTv.setText("+ "+sumBusinessTicket+" business ticket : "+ seatBusiness +"\n"+
+                    "+ "+sumEcoTicket+" eco ticket : "+ seatEco +"\n"+
+                    "You have pay "+ (sumPrice*1000) + " VND");
+
+            cancelDialog.setOnClickListener(view1 -> {
+                dialog.dismiss();
+            });
+
+            dialog.show();
+
+        });
+
+    }
+
+    @Override
+    public void onAdapterItemClickListener(List<FlightTicket> flightTicketSelectedList) {
+        this.flightTicketSelectedList = flightTicketSelectedList;
     }
 }

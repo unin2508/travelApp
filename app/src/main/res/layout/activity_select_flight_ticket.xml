@@ -218,6 +218,7 @@
             android:background="@color/white">
         </androidx.recyclerview.widget.RecyclerView>
         <Button
+            android:id="@+id/continue_flight_ticket_btn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Continue"

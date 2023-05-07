@@ -21,9 +21,11 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
     private final Context context;
     private List<FlightTicket> flightTicketList;
     private List<FlightTicket> flightTicketSelectedList = new ArrayList<>();
+    private OnRowFlightTicketAdapterItemClickListener adapterItemClickListener = null;
 
-    public RowFlightTicketAdapter(Context context){
+    public RowFlightTicketAdapter(Context context,OnRowFlightTicketAdapterItemClickListener listener){
         this.context = context;
+        this.adapterItemClickListener = listener;
     }
 
     public void setData(List<FlightTicket> flightTicketList){
@@ -75,8 +77,13 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
                 button.setImageResource(R.drawable.ic_ticket_selected);
                 flightTicketSelectedList.add(ticket);
             }
+            adapterItemClickListener.onAdapterItemClickListener(this.flightTicketSelectedList);
         });
 
+    }
+
+    public interface OnRowFlightTicketAdapterItemClickListener {
+        void onAdapterItemClickListener(List<FlightTicket> flightTicketSelectedList);
     }
 
     public class FlightTicketViewHolder extends RecyclerView.ViewHolder {
