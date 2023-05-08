@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,6 +36,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -53,6 +55,8 @@ public class SelectFlightActivity extends AppCompatActivity {
     LocalDate flightDate = null;
     Airport departureAirport = null;
     Airport arrivalAirport = null;
+    Button lowToHighBtn;
+    Button highToLowBtn;
 
     @Override
     protected void onStart() {
@@ -241,5 +245,19 @@ public class SelectFlightActivity extends AppCompatActivity {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
         flightRV.setLayoutManager(linearLayoutManager);
         flightRV.setAdapter(flightAdapter);
+        highToLowBtn = findViewById(R.id.high_to_low_btn);
+        highToLowBtn.setOnClickListener(view -> {
+            Collections.sort(flights,((f1, f2) -> {
+                return f2.getMinPrice() - f1.getMinPrice() ;
+            }));
+            flightAdapter.setData(flights);
+        });
+        lowToHighBtn = findViewById(R.id.low_to_high_btn);
+        lowToHighBtn.setOnClickListener(view -> {
+            Collections.sort(flights,((f1, f2) -> {
+                return f1.getMinPrice() - f2.getMinPrice() ;
+            }));
+            flightAdapter.setData(flights);
+        });
     }
 }
