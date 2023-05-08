@@ -43,7 +43,7 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
 
     @Override
     public void onBindViewHolder(@NonNull FlightTicketViewHolder holder, int position) {
-        int row = (int) position/6;
+        int row = position;
         holder.rowTv.setText(position+1+"");
         setUpUI(holder.imageButton1,flightTicketList.get(row * 6),row,0);
         setUpUI(holder.imageButton2,flightTicketList.get(row*6 +1),row,1);
@@ -66,6 +66,7 @@ public class RowFlightTicketAdapter extends RecyclerView.Adapter<RowFlightTicket
         FlightTicket ticket = flightTicketList.get(row*6+index);
         if (flightTicket.getSold()){
             button.setImageResource(R.drawable.ic_ticket_booked);
+            return;
         } else if (!flightTicketSelectedList.contains(flightTicket)){
             button.setImageResource(R.drawable.ic_ticket_available);
         }

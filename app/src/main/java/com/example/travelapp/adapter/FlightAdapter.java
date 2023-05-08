@@ -14,6 +14,7 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.travelapp.R;
+import com.example.travelapp.activity.FlightTicketDetailActivity;
 import com.example.travelapp.activity.SelectFlightTicketActivity;
 import com.example.travelapp.model.Category;
 import com.example.travelapp.model.Flight;
@@ -28,9 +29,11 @@ import java.util.List;
 public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightViewHolder> {
     private Context context;
     private List<Flight> flightList;
+    private int type;
 
-    public FlightAdapter(Context context){
+    public FlightAdapter(Context context,int type){
         this.context = context;
+        this.type = type;
     }
 
     public void setData(List<Flight> flights){
@@ -67,12 +70,21 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightView
         holder.minPriceTv.setText(flightList.get(position).getMinPrice()+"000 VND");
 
         holder.layout.setOnClickListener(view -> {
-            Intent intent = new Intent(context, SelectFlightTicketActivity.class);
-            intent.putExtra("flight",flightList.get(position));
-            intent.putExtra("flightTime",flightTimeString);
-            intent.putExtra("departureAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getDepartureAirport()));
-            intent.putExtra("arrivalAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getArrivalAirport()));
-            context.startActivity(intent);
+            if (type == 1){
+                Intent intent = new Intent(context, SelectFlightTicketActivity.class);
+                intent.putExtra("flight",flightList.get(position));
+                intent.putExtra("flightTime",flightTimeString);
+                intent.putExtra("departureAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getDepartureAirport()));
+                intent.putExtra("arrivalAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getArrivalAirport()));
+                context.startActivity(intent);
+            } else if (type == 2){
+                Intent intent = new Intent(context, FlightTicketDetailActivity.class);
+                intent.putExtra("flight",flightList.get(position));
+                intent.putExtra("flightTime",flightTimeString);
+                intent.putExtra("departureAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getDepartureAirport()));
+                intent.putExtra("arrivalAirportName",new AirportDao(context).getAirportNameByCode(flightList.get(position).getArrivalAirport()));
+                context.startActivity(intent);
+            }
         });
 
     }

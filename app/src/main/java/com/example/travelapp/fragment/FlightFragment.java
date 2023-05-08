@@ -230,37 +230,14 @@ public class FlightFragment extends Fragment {
                 } else if (departureDate == null){
                     Toast.makeText(getContext(),"Pick Departure Date",Toast.LENGTH_LONG).show();
                 } else {
-                    progressBar.setVisibility(View.VISIBLE);
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("flights");
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-                    String formattedDate = departureDate.format(formatter);
-                    ArrayList<Flight> flightSearchList = new ArrayList<>();
-                    databaseReference.child(formattedDate).child(airportArrayList.get(airportFrom).getIata_code()).child(airportArrayList.get(airportTo).getIata_code()).orderByChild("departureTime").addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            progressBar.setVisibility(View.INVISIBLE);
-                            if (!snapshot.hasChildren()) {
-                                Toast.makeText(getContext(),"khong co chuyen bay phu hop",Toast.LENGTH_LONG).show();
-                            } else {
-                                for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                    Flight flight = dataSnapshot.getValue(Flight.class);
-                                    flightSearchList.add(flight);
-                                }
-                                Intent intent = new Intent(view.getContext(), SelectFlightActivity.class);
-                                Log.d("debug",flightSearchList.size()+" gui");
-                                intent.putExtra("flightsSearch",flightSearchList);
-                                intent.putExtra("flightDate",departureDate);
-                                intent.putExtra("departureAirport",airportArrayList.get(airportFrom));
-                                intent.putExtra("arrivalAirport",airportArrayList.get(airportTo));
-                                startActivity(intent);
-                            }
-                        }
+//                    progressBar.setVisibility(View.VISIBLE);
+//                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("flights");
 
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-                        }
-                    });
-
+                    Intent intent = new Intent(view.getContext(), SelectFlightActivity.class);
+                    intent.putExtra("flightDate",departureDate);
+                    intent.putExtra("departureAirport",airportArrayList.get(airportFrom));
+                    intent.putExtra("arrivalAirport",airportArrayList.get(airportTo));
+                    startActivity(intent);
                 }
             }
         });

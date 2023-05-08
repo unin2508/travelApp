@@ -1,5 +1,6 @@
 package com.example.travelapp.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,9 +25,17 @@ import com.example.travelapp.model.Airport;
 import com.example.travelapp.model.Flight;
 import com.example.travelapp.model.FlightTicket;
 import com.example.travelapp.service.AirportDao;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +44,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,6 +62,7 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
     private Button continueButton;
 
     private List<FlightTicket> flightTicketSelectedList;
+    private Flight flight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +70,12 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
         setContentView(R.layout.activity_select_flight_ticket);
         flightTicketSelectedList = new ArrayList<>();
         Intent intent = getIntent();
-        Flight flight = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             flight = (Flight) intent.getSerializableExtra("flight", Flight.class);
         } else {
             flight = (Flight) intent.getParcelableExtra("flight");
         }
+        String uid = FirebaseAuth.getInstance().getUid();
         long timestamp = flight.getDepartureTime();
         Instant instant = Instant.ofEpochSecond(timestamp);
         ZonedDateTime zonedDateTime = instant.atZone(ZoneId.systemDefault());
@@ -127,8 +138,8 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
 
         continueButton = findViewById(R.id.continue_flight_ticket_btn);
         continueButton.setOnClickListener(view -> {
-            if (flightTicketSelectedList.isEmpty()){
-                Toast.makeText(this,"Please pick a ticket",Toast.LENGTH_LONG).show();
+            if (flightTicketSelectedList.isEmpty()) {
+                Toast.makeText(this, "Please pick a ticket", Toast.LENGTH_LONG).show();
                 return;
             }
             final Dialog dialog = new Dialog(this);
@@ -136,10 +147,10 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
             dialog.setContentView(R.layout.confirm_flight_ticket_layout);
 
             Window window = dialog.getWindow();
-            if (window == null){
+            if (window == null) {
                 return;
             }
-            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT,WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             window.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
 
             WindowManager.LayoutParams windowAttibutes = window.getAttributes();
@@ -157,8 +168,8 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
             int sumBusinessTicket = 0;
             String seatBusiness = "";
             String seatEco = "";
-            for (FlightTicket flightTicket : this.flightTicketSelectedList){
-                if (flightTicket.getType().equals("business")){
+            for (FlightTicket flightTicket : this.flightTicketSelectedList) {
+                if (flightTicket.getType().equals("business")) {
                     sumBusinessTicket += 1;
                     seatBusiness += flightTicket.getSeat() + ",";
                 } else if (flightTicket.getType().equals("eco")) {
@@ -167,24 +178,60 @@ public class SelectFlightTicketActivity extends AppCompatActivity implements Row
                 }
                 sumPrice += flightTicket.getPrice();
             }
-            if (seatBusiness.length()>0){
-                seatBusiness = seatBusiness.substring(0,seatBusiness.length()-1);
+            if (seatBusiness.length() > 0) {
+                seatBusiness = seatBusiness.substring(0, seatBusiness.length() - 1);
             }
-            if (seatEco.length()>0){
-                seatEco = seatEco.substring(0,seatEco.length()-1);
+            if (seatEco.length() > 0) {
+                seatEco = seatEco.substring(0, seatEco.length() - 1);
             }
-            contentTv.setText("+ "+sumBusinessTicket+" business ticket : "+ seatBusiness +"\n"+
-                    "+ "+sumEcoTicket+" eco ticket : "+ seatEco +"\n"+
-                    "You have pay "+ (sumPrice*1000) + " VND");
+            contentTv.setText("+ " + sumBusinessTicket + " business ticket : " + seatBusiness + "\n" +
+                    "+ " + sumEcoTicket + " eco ticket : " + seatEco + "\n" +
+                    "You have pay " + (sumPrice * 1000) + " VND");
 
             cancelDialog.setOnClickListener(view1 -> {
                 dialog.dismiss();
             });
 
+
+            confirmBtn.setOnClickListener(view1 -> {
+                List<FlightTicket> ticketList = flight.getTicketList();
+                for (FlightTicket flightTicket : flightTicketSelectedList) {
+                    int index = ticketList.indexOf(flightTicket);
+                    ticketList.get(index).setSold(true);
+                    ticketList.get(index).setUserId(uid);
+                }
+                flight.setTicketList(ticketList);
+                Date date = new Date(flight.getDepartureTime() * 1000L);
+                SimpleDateFormat formatter3 = new SimpleDateFormat("dd-MM-yyyy");
+                String formattedDate = formatter3.format(date);
+                DatabaseReference ticketDatabaseReference = databaseReference.child("flights").child(formattedDate).child(flight.getDepartureAirport()).child(flight.getArrivalAirport()).child(flight.getId()).child("ticketList");
+                DatabaseReference cartDatabaseReference =  databaseReference.child("cart").child(uid).child(flight.getId());
+
+                ticketDatabaseReference.setValue(ticketList).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        cartDatabaseReference.setValue(flight).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    backToMainScreen();
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
             dialog.show();
 
         });
+    }
 
+    private void backToMainScreen(){
+        Toast.makeText(this,"Booking success",Toast.LENGTH_LONG).show();
+        Intent intent1 = new Intent(this, MainActivity.class);
+        intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent1);
     }
 
     @Override

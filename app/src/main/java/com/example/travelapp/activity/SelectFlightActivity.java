@@ -17,6 +17,7 @@ import com.example.travelapp.R;
 import com.example.travelapp.adapter.FlightAdapter;
 import com.example.travelapp.model.Airport;
 import com.example.travelapp.model.Flight;
+import com.example.travelapp.service.AirportDao;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
@@ -49,17 +50,22 @@ public class SelectFlightActivity extends AppCompatActivity {
     private TextView codeArrivalAirportTv;
     private TextView nameArrivalAirportTv;
     private TextView timeOfFlightTv;
+    LocalDate flightDate = null;
+    Airport departureAirport = null;
+    Airport arrivalAirport = null;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_filght);
         Intent intent = getIntent();
-        flights = (ArrayList<Flight>) intent.getSerializableExtra("flightsSearch");
 
-        LocalDate flightDate = null;
-        Airport departureAirport = null;
-        Airport arrivalAirport = null;
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
             flightDate = (LocalDate) intent.getSerializableExtra("flightDate",LocalDate.class);
             departureAirport = (Airport) intent.getSerializableExtra("departureAirport",Airport.class);
@@ -69,45 +75,68 @@ public class SelectFlightActivity extends AppCompatActivity {
             departureAirport = (Airport) intent.getSerializableExtra("departureAirport");
             arrivalAirport = (Airport) intent.getSerializableExtra("arrivalAirport");
         }
-        LocalDateTime dateTime = LocalDateTime.of(flightDate, LocalTime.now());
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("flights");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        String formattedDate = flightDate.format(formatter);
+        flights = new ArrayList<>();
+        databaseReference.child(formattedDate).child(departureAirport.getIata_code()).child(arrivalAirport.getIata_code()).orderByChild("departureTime").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                            progressBar.setVisibility(View.INVISIBLE);
+                if (!snapshot.hasChildren()) {
+                    Toast.makeText(getApplicationContext(),"khong co chuyen bay phu hop",Toast.LENGTH_LONG).show();
+                } else {
+                    for (DataSnapshot dataSnapshot : snapshot.getChildren()){
+                        Flight flight = dataSnapshot.getValue(Flight.class);
+                        flights.add(flight);
+                    }
+                    setUpUI();
+                }
+            }
 
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
-        String formattedDateTime = dateTime.format(formatter);
-        int seconds = (int) (flights.get(0).getArrivalTime() - flights.get(0).getDepartureTime()); // replace with your desired number of seconds
-
-        int hours = seconds / 3600; // calculate the number of hours
-        int minutes = (seconds % 3600) / 60; // calculate the number of minutes
-
-        LocalTime time = LocalTime.of(hours, minutes);
-        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("hh'h' mm'm'");
-        String flightTimeString = time.format(formatter2);
-
-        codeDepartureAirportTv = findViewById(R.id.code_departure_airport_Tv);
-        nameDepartureAirportTv = findViewById(R.id.name_departure_airport_Tv);
-        codeArrivalAirportTv = findViewById(R.id.code_arrival_airport_Tv);
-        nameArrivalAirportTv = findViewById(R.id.name_arrival_airport_Tv);
-        timeOfFlightTv = findViewById(R.id.time_of_flight_selectFlight_tv);
-
-
-        codeDepartureAirportTv.setText(departureAirport.getIata_code());
-        nameDepartureAirportTv.setText(departureAirport.getName());
-        codeArrivalAirportTv.setText(arrivalAirport.getIata_code());
-        nameArrivalAirportTv.setText(arrivalAirport.getName());
-        timeOfFlightTv.setText(flightTimeString);
-
-        dateFlightTv = findViewById(R.id.date_of_flight_tv);
-        dateFlightTv.setText(formattedDateTime);
-
-        backBtn = findViewById(R.id.back_btn);
-        backBtn.setOnClickListener(view -> {finish();});
-
-        flightRV = findViewById(R.id.flight_rv);
-        FlightAdapter flightAdapter = new FlightAdapter(this);
-
-        flightAdapter.setData(flights);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
-        flightRV.setLayoutManager(linearLayoutManager);
-        flightRV.setAdapter(flightAdapter);
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+//        LocalDateTime dateTime = LocalDateTime.of(flightDate, LocalTime.now());
+//
+//        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+//        String formattedDateTime = dateTime.format(formatter1);
+//        int seconds = (int) (flights.get(0).getArrivalTime() - flights.get(0).getDepartureTime()); // replace with your desired number of seconds
+//
+//        int hours = seconds / 3600; // calculate the number of hours
+//        int minutes = (seconds % 3600) / 60; // calculate the number of minutes
+//
+//        LocalTime time = LocalTime.of(hours, minutes);
+//        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("hh'h' mm'm'");
+//        String flightTimeString = time.format(formatter2);
+//
+//        codeDepartureAirportTv = findViewById(R.id.code_departure_airport_Tv);
+//        nameDepartureAirportTv = findViewById(R.id.name_departure_airport_Tv);
+//        codeArrivalAirportTv = findViewById(R.id.code_arrival_airport_Tv);
+//        nameArrivalAirportTv = findViewById(R.id.name_arrival_airport_Tv);
+//        timeOfFlightTv = findViewById(R.id.time_of_flight_selectFlight_tv);
+//
+//
+//        codeDepartureAirportTv.setText(departureAirport.getIata_code());
+//        nameDepartureAirportTv.setText(departureAirport.getName());
+//        codeArrivalAirportTv.setText(arrivalAirport.getIata_code());
+//        nameArrivalAirportTv.setText(arrivalAirport.getName());
+//        timeOfFlightTv.setText(flightTimeString);
+//
+//        dateFlightTv = findViewById(R.id.date_of_flight_tv);
+//        dateFlightTv.setText(formattedDateTime);
+//
+//        backBtn = findViewById(R.id.back_btn);
+//        backBtn.setOnClickListener(view -> {finish();});
+//
+//        flightRV = findViewById(R.id.flight_rv);
+//        FlightAdapter flightAdapter = new FlightAdapter(this);
+//
+//        flightAdapter.setData(flights);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+//        flightRV.setLayoutManager(linearLayoutManager);
+//        flightRV.setAdapter(flightAdapter);
 
 
 //        gen flight firebase
@@ -170,6 +199,47 @@ public class SelectFlightActivity extends AppCompatActivity {
 //            }
 
 
+    }
 
+    private void setUpUI(){
+        LocalDateTime dateTime = LocalDateTime.of(flightDate, LocalTime.now());
+
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        String formattedDateTime = dateTime.format(formatter1);
+        int seconds = (int) (flights.get(0).getArrivalTime() - flights.get(0).getDepartureTime()); // replace with your desired number of seconds
+
+        int hours = seconds / 3600; // calculate the number of hours
+        int minutes = (seconds % 3600) / 60; // calculate the number of minutes
+
+        LocalTime time = LocalTime.of(hours, minutes);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("hh'h' mm'm'");
+        String flightTimeString = time.format(formatter2);
+
+        codeDepartureAirportTv = findViewById(R.id.code_departure_airport_Tv);
+        nameDepartureAirportTv = findViewById(R.id.name_departure_airport_Tv);
+        codeArrivalAirportTv = findViewById(R.id.code_arrival_airport_Tv);
+        nameArrivalAirportTv = findViewById(R.id.name_arrival_airport_Tv);
+        timeOfFlightTv = findViewById(R.id.time_of_flight_selectFlight_tv);
+
+
+        codeDepartureAirportTv.setText(departureAirport.getIata_code());
+        nameDepartureAirportTv.setText(departureAirport.getName());
+        codeArrivalAirportTv.setText(arrivalAirport.getIata_code());
+        nameArrivalAirportTv.setText(arrivalAirport.getName());
+        timeOfFlightTv.setText(flightTimeString);
+
+        dateFlightTv = findViewById(R.id.date_of_flight_tv);
+        dateFlightTv.setText(formattedDateTime);
+
+        backBtn = findViewById(R.id.back_btn);
+        backBtn.setOnClickListener(view -> {finish();});
+
+        flightRV = findViewById(R.id.flight_rv);
+        FlightAdapter flightAdapter = new FlightAdapter(this,1);
+
+        flightAdapter.setData(flights);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        flightRV.setLayoutManager(linearLayoutManager);
+        flightRV.setAdapter(flightAdapter);
     }
 }

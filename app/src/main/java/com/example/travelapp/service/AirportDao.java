@@ -43,4 +43,13 @@ public class AirportDao {
         }
         return null;
     }
+
+    public Airport getAirportByCode(String code){
+        for (Airport airport :airportArrayList){
+            if (airport.getIata_code().equals(code)){
+                return  airport;
+            }
+        }
+        return null;
+    }
 }
