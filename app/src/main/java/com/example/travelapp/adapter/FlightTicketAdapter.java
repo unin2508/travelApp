@@ -63,7 +63,7 @@ public class FlightTicketAdapter extends RecyclerView.Adapter<FlightTicketAdapte
 
         public FlightTicketDetailViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameTv = itemView.findViewById(R.id.passenger_name_tv);
+//            nameTv = itemView.findViewById(R.id.passenger_name_tv);
             typeTv = itemView.findViewById(R.id.type_flight_ticket_tv);
             priceTv = itemView.findViewById(R.id.price_flight_ticket_tv);
             boardingTv = itemView.findViewById(R.id.boarding_time_tv);
