@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightViewHolder> {
@@ -60,14 +61,28 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightView
         Timestamp departureTime = new Timestamp(flightList.get(position).getDepartureTime()*1000L);
         Timestamp arrivalTime = new Timestamp(flightList.get(position).getArrivalTime()*1000L);
 //        String formattedTime = formatter.format(timestamp);
-        holder.airlineTv.setText(flightList.get(position).getAirlineName());
+        if (flightList.get(position).getAirlineName() == "VN"){
+            holder.airlineTv.setText("Vietnam Airline");
+        }
+
         holder.departureAirportTv.setText(flightList.get(position).getDepartureAirport());
 
         holder.departureTimeTv.setText(formatter.format(departureTime));
         holder.timeFlightTv.setText(flightTimeString);
         holder.arriveAirportTv.setText(flightList.get(position).getArrivalAirport());
         holder.timeArriveTv.setText(formatter.format(flightList.get(position).getArrivalTime()*1000L));
-        holder.minPriceTv.setText(flightList.get(position).getMinPrice()+"000 VND");
+        if (type == 1){
+            holder.minPriceTv.setText(flightList.get(position).getMinPrice()+"000 VND");
+        } else if (type == 2){
+            long timestamp = flightList.get(position).getDepartureTime()*1000L;
+            Date date = new Date(timestamp);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            String dateString = dateFormat.format(date);
+            holder.minPriceTv.setText(dateString);
+        }
+
+        holder.airlineImage.setImageDrawable(context.getDrawable(R.drawable.img_vn));
+
 
         holder.layout.setOnClickListener(view -> {
             if (type == 1){
