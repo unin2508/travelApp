@@ -62,7 +62,7 @@ public class SelectAirPortActivity extends AppCompatActivity {
                         intent.putExtra("ToAirport",i);
                     }
                     setResult(RESULT_OK, intent);
-                    onBackPressed();
+                    finish();
                 }
             });
 
